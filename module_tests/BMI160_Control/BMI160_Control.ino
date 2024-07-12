@@ -50,20 +50,23 @@ void setup()
 
 void loop()
 {
-  uint16_t pmu_status = readData(BMI160_PMU_STATUS);
+  /*uint8_t pmu_status = readData(BMI160_PMU_STATUS);
   Serial.print("PMU Status = ");
-  Serial.println(pmu_status);
+  Serial.println(pmu_status);*/
+
+  int16_t y_axis_acc = readData(BMI160_ACC_X);
+  Serial.print("ACC Y = ");
+  Serial.println(y_axis_acc);
 
   uint16_t error_code = readData(BMI160_ERROR);
   Serial.print("ERROR Code = ");
   Serial.println(error_code);
 
-  delay(1000);
+  delay(66);
 }
 
 void configureBMI160()
 {
-  // Set accelerometer configuration (example configuration)
   __writeRegister(__BMI160_CMD, 0x11);  // Set accelerometer to normal mode
   delay(10);
   __writeRegister(__BMI160_CMD, 0x15);  // Set gyroscope to normal mode
