@@ -44,19 +44,16 @@
 #define __BMI160_GYR_RANGE 0x43
 #define __BMI160_CMD 0x7E
 
-const float alpha_high = 0.5;
-const float alpha_low = 0.9;
+#define ALPHA_HIGH 0.5
+#define ALPHA_LOW 0.9
 
-int16_t acc_x = 0;
-int16_t acc_y = 0;
-int16_t acc_z = 0;
-int16_t gyr_x = 0;
-int16_t gyr_y = 0;
-int16_t gyr_z = 0;
+#define SMOOTH_WINDOW_N 20;
 
-float prevAccX = 0;
-float prevAccY = 0;
-float prevAccZ = 0;
+u_int8_t window_n = 0;
+int16_t raw_data[6][SMOOTH_WINDOW_N] = {0};
+float filtered_data[6][SMOOTH_WINDOW_N] = {0};
+float grad_data[6][SMOOTH_WINDOW_N] = {0};
+
 
 
 void setup()
@@ -68,9 +65,8 @@ void setup()
 
 void loop()
 {
-  float sensor_data[6] = {0};
-  readSensorData(acc_x, acc_y, acc_z, gyr_x, gyr_y, gyr_z);
-  postProcessData(acc_x, acc_y, acc_z, gyr_x, gyr_y, gyr_z, sensor_data);
+  readSensorData(raw_data);
+  normalizeData(raw_data, filtered_data);
   float ax = sensor_data[0];
   float ay = sensor_data[1];
   float az = sensor_data[2];
@@ -78,15 +74,23 @@ void loop()
   float gy = sensor_data[4];
   float gz = sensor_data[5];
 
+  // Correct natural, constant bias due to gravity
+  az -= 0.5;
+
   // High pass filter
-  float filteredAccX = alpha_high * (prevAccX + ax - prevAccX);
-  float filteredAccY = alpha_high * (prevAccY + ay - prevAccY);
-  float filteredAccZ = alpha_high * (prevAccZ + az - prevAccZ);
+  float filteredAccX = ALPHA_HIGH * (prevAccX + ax - prevAccX);
+  float filteredAccY = ALPHA_HIGH * (prevAccY + ay - prevAccY);
+  float filteredAccZ = ALPHA_HIGH * (prevAccZ + az - prevAccZ);
 
   // Low pass filter
-  filteredAccX = alpha_low * filteredAccX + (1 - alpha_low) * prevAccX;
-  filteredAccY = alpha_low * filteredAccY + (1 - alpha_low) * prevAccY;
-  filteredAccZ = alpha_low * filteredAccZ + (1 - alpha_low) * prevAccZ;
+  filteredAccX = ALPHA_LOW * filteredAccX + (1 - ALPHA_LOW) * prevAccX;
+  filteredAccY = ALPHA_LOW * filteredAccY + (1 - ALPHA_LOW) * prevAccY;
+  filteredAccZ = ALPHA_LOW * filteredAccZ + (1 - ALPHA_LOW) * prevAccZ;
+
+  // Compute differentials
+  ax_diff = prevAccX - filteredAccX;
+  ay_diff = prevAccY - filteredAccY;
+  az_diff = prevAccZ - filteredAccZ;
 
   // Update previous values
   prevAccX = filteredAccX;
@@ -99,11 +103,11 @@ void loop()
   Serial.print(" ");
   Serial.print(filteredAccZ);
   Serial.print(" ");
-  Serial.print(ax);
+  Serial.print(ax_diff);
   Serial.print(" ");
-  Serial.print(ay);
+  Serial.print(ay_diff);
   Serial.print(" ");
-  Serial.println(az);
+  Serial.println(az_diff);
   /*Serial.print(" ");
   Serial.print(gx);
   Serial.print(" ");
@@ -114,9 +118,7 @@ void loop()
   delay(66);
 }
 
-void postProcessData(int16_t acc_x, int16_t acc_y, int16_t acc_z,
-                     int16_t gyr_x, int16_t gyr_y, int16_t gyr_z,
-                     float* sensor_data)
+void normalizeData(int16_t[] raw_data, float[] normalized_data)
 {
   sensor_data[0] = acc_x / 16384.0;
   sensor_data[1] = acc_y / 16384.0;
