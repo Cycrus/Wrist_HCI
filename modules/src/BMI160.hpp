@@ -12,7 +12,6 @@
 #ifndef BMI160_HPP
 #define BMI160_HPP
 
-
 #include <Arduino.h>
 #include <Wire.h>
 
