@@ -71,7 +71,7 @@ const uint8_t HID_REPORT_DESCRIPTOR[] = {
   0x75, 0x01,        //     Report Size (1)
   0x81, 0x02,        //     Input (Data, Variable, Absolute)
   0x95, 0x01,        //     Report Count (1)
-  0x75, 0x05,        //     Report Size (5)
+  0x75, 0x04,        //     Report Size (4)
   0x81, 0x03,        //     Input (Const, Variable, Absolute)
   0x05, 0x01,        //     Usage Page (Generic Desktop)
   0x09, 0x30,        //     Usage (X)
@@ -135,20 +135,42 @@ void loop()
 
     while (central.connected())
     {
-      // Example usage
-      Serial.println("A pressed.");
-      sendKeyboardPress('a', MOD_NONE);
-      delay(100);
-      sendKeyboardRelease();
-      delay(1000);
-      Serial.println("Mouse moved.");
+      while(Serial.available())
+      {
+          char debug_input = Serial.read();
+          if(debug_input == 'a')
+          {
+              Serial.println("Pressing A.");
+              sendKeyboardPress('a', MOD_NONE);
+              delay(100);
+              Serial.println("Release A press");
+              sendKeyboardRelease();
+              delay(1000);
+          }
+      }
+      
+      /*Serial.println("Mouse moved.");
       sendMouseMove(20, 20);
-      delay(1000);
+      delay(1000);*/
     }
 
     Serial.print("Disconnected from central: ");
     Serial.println(central.address());
   }
+}
+
+void debugPrintMessage(const char* name, uint8_t message[], uint8_t size)
+{
+    Serial.print("Message <");
+    Serial.print(name);
+    Serial.print(">: ");
+    for(int i = 0; i < size; i++)
+    {
+        Serial.print(message[i]);
+        if(i < size - 1)
+            Serial.print(" | ");
+    }
+    Serial.println("");
 }
 
 void sendKeyboardPress(char key, uint8_t modifier)
@@ -165,6 +187,7 @@ void sendKeyboardPress(char key, uint8_t modifier)
     8. Key 6
    */
   uint8_t key_report_message[9] = {0x01, modifier, 0, key - 93, 0, 0, 0, 0, 0};
+  debugPrintMessage("keyboard", key_report_message, 9);
   keyboard_report.writeValue(key_report_message, sizeof(key_report_message));
 }
 

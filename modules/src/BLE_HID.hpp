@@ -63,7 +63,7 @@ const uint8_t HID_REPORT_DESCRIPTOR[] = {
   0x95, 0x08,        // Report Count (8)
   0x81, 0x02,        // Input (Data, Variable, Absolute)
   0x95, 0x01,        // Report Count (1)
-  0x75, KEYBOARD_MESSAGE_LEN,        // Report Size (9)
+  0x75, (KEYBOARD_MESSAGE_LEN - 1),        // Report Size (8)
   0x81, 0x03,        // Input (Constant) reserved byte(1)
   0x95, 0x05,        // Report Count (5)
   0x75, 0x01,        // Report Size (1)
@@ -100,7 +100,7 @@ const uint8_t HID_REPORT_DESCRIPTOR[] = {
   0x75, 0x01,        //     Report Size (1)
   0x81, 0x02,        //     Input (Data, Variable, Absolute)
   0x95, 0x01,        //     Report Count (1)
-  0x75, MOUSE_MESSAGE_LEN,        //     Report Size (5)
+  0x75, (MOUSE_MESSAGE_LEN - 1),        //     Report Size (5)
   0x81, 0x03,        //     Input (Const, Variable, Absolute)
   0x05, 0x01,        //     Usage Page (Generic Desktop)
   0x09, 0x30,        //     Usage (X)
@@ -148,6 +148,8 @@ class BLE_HID
 
         uint8_t _key_report_message[KEYBOARD_MESSAGE_LEN];
         uint8_t _mouse_report_message[MOUSE_MESSAGE_LEN];
+
+        void __debugPrintMessage(const char* name, uint8_t message[], uint8_t size);
 
 };
 

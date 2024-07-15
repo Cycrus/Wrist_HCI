@@ -120,12 +120,28 @@ void BLE_HID::sendMouseRelease()
 
 void BLE_HID::sendKeyboardMessage()
 {
+    __debugPrintMessage("keyboard", _key_report_message, KEYBOARD_MESSAGE_LEN);
     _keyboard_report.writeValue(_key_report_message, sizeof(_key_report_message));
     resetKeyboardMessage();
 }
 
 void BLE_HID::sendMouseMessage()
 {
+    __debugPrintMessage("mouse", _mouse_report_message, MOUSE_MESSAGE_LEN);
     _mouse_report.writeValue(_mouse_report_message, sizeof(_mouse_report_message));
     resetMouseMessage();
+}
+
+void BLE_HID::__debugPrintMessage(const char* name, uint8_t message[], uint8_t size)
+{
+    Serial.print("Message <");
+    Serial.print(name);
+    Serial.print(">: ");
+    for(int i = 0; i < size; i++)
+    {
+        Serial.print(message[i]);
+        if(i < size - 1)
+            Serial.print(" | ");
+    }
+    Serial.println("");
 }
