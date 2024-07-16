@@ -37,37 +37,41 @@ void setup()
 
 void loop()
 {
-    bmi160.testRoutine();
+    //bmi160.testRoutine();
     //input_device.testRoutine();
 
-    /*if(input_device.checkRemoteAvailability())
+    if(input_device.checkRemoteAvailability())
     {
         while(input_device.checkRemoteConnection())
         {
-            Serial.println("before");
             bmi160.fetchSensorData();
             bmi160.getProcessedData(data);
-            Serial.println("after");
 
             int16_t x_movement = data[GYR_Z] * 300.0 * -1.0;
             int16_t y_movement = data[GYR_X] * 300.0;
             float click_movement = data[GYR_Y];
 
             if(x_movement > MAX_MOVEMENT_STRENGHT)
-              x_movement = MAX_MOVEMENT_STRENGHT;
+                x_movement = MAX_MOVEMENT_STRENGHT;
             if(x_movement < -MAX_MOVEMENT_STRENGHT)
-              x_movement = -MAX_MOVEMENT_STRENGHT;
+                x_movement = -MAX_MOVEMENT_STRENGHT;
             if(y_movement > MAX_MOVEMENT_STRENGHT)
-              y_movement = MAX_MOVEMENT_STRENGHT;
+                y_movement = MAX_MOVEMENT_STRENGHT;
             if(y_movement < -MAX_MOVEMENT_STRENGHT)
-              y_movement = -MAX_MOVEMENT_STRENGHT;
+                y_movement = -MAX_MOVEMENT_STRENGHT;
 
             input_device.setMouseMove(x_movement, y_movement);
 
-            if(click_movement > 0.5)
-              input_device.setMouseButtonPress(MOUSE_LEFT);
-            else if(click_movement < -0.5)
-              input_device.setMouseButtonPress(MOUSE_RIGHT);
+            if(click_movement > 0.1)
+            {
+                Serial.println("Left Click");
+                input_device.setMouseButtonPress(MOUSE_LEFT);
+            }
+            else if(click_movement < -0.1)
+            {
+                Serial.println("Right Click");
+                input_device.setMouseButtonPress(MOUSE_RIGHT);
+            }
 
             int button_up = digitalRead(BUTTON_MOVE_UP);
             int button_right = digitalRead(BUTTON_MOVE_RIGHT);
@@ -75,16 +79,24 @@ void loop()
             int button_left = digitalRead(BUTTON_MOVE_LEFT);
 
             if(digitalRead(BUTTON_MOVE_UP) == HIGH)
-              input_device.setKeyboardButtonPress('w', MOD_LEFT_CTR | MOD_LEFT_ALT);
+            {
+                input_device.setKeyboardButtonPress('w', MOD_LEFT_CTR | MOD_LEFT_ALT);
+            }
             if(digitalRead(BUTTON_MOVE_DOWN) == HIGH)
-              input_device.setKeyboardButtonPress('s', MOD_LEFT_CTR | MOD_LEFT_ALT);
+            {
+                input_device.setKeyboardButtonPress('s', MOD_LEFT_CTR | MOD_LEFT_ALT);
+            }
             if(digitalRead(BUTTON_MOVE_LEFT) == HIGH)
-              input_device.setKeyboardButtonPress('a', MOD_LEFT_CTR | MOD_LEFT_ALT);
+            {
+                input_device.setKeyboardButtonPress('a', MOD_LEFT_CTR | MOD_LEFT_ALT);
+            }
             if(digitalRead(BUTTON_MOVE_RIGHT) == HIGH)
-              input_device.setKeyboardButtonPress('d', MOD_LEFT_CTR | MOD_LEFT_ALT);
+            {
+                input_device.setKeyboardButtonPress('d', MOD_LEFT_CTR | MOD_LEFT_ALT);
+            }
 
             input_device.sendKeyboardMessage();
             input_device.sendMouseMessage();
         }
-    }*/
+    }
 }

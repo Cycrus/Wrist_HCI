@@ -16,7 +16,8 @@ BLE_HID::BLE_HID() :
     _keyboard_report("2A4D", BLERead | BLENotify, KEYBOARD_MESSAGE_LEN, true),
     _mouse_report("2A4D", BLERead | BLENotify, MOUSE_MESSAGE_LEN, true),
     _key_report_message({0x01, 0, 0, 0, 0, 0, 0, 0, 0}),
-    _mouse_report_message({0x02, 0, 0, 0, 0})
+    _mouse_report_message({0x02, 0, 0, 0, 0}),
+    _curr_keyboard_button{0}
 { }
 
 void BLE_HID::initService(const char* device_name)
@@ -72,8 +73,12 @@ bool BLE_HID::checkRemoteConnection()
 
 void BLE_HID::setKeyboardButtonPress(char button, uint8_t modifier)
 {
-    _key_report_message[KEYBOARD_FIELD_MODIFIER] = modifier;
-    _key_report_message[KEYBOARD_FIELD_BUTTON] = button - 93;
+    if(_curr_keyboard_button >= MAX_KEYBOARD_KEYS)
+        return;
+
+    _key_report_message[KEYBOARD_FIELD_MODIFIER] |= modifier;
+    _key_report_message[KEYBOARD_FIELD_BUTTON + _curr_keyboard_button] = button - 93;
+    _curr_keyboard_button++;
 }
 
 void BLE_HID::setMouseButtonPress(uint8_t button)
@@ -97,6 +102,7 @@ void BLE_HID::resetKeyboardMessage()
     for(int i = 1; i < KEYBOARD_MESSAGE_LEN; i++)
         _key_report_message[i] = 0;
     _key_report_message[0] = KEYBOARD_ID;
+    _curr_keyboard_button = 0;
 }
 
 void BLE_HID::resetMouseMessage()

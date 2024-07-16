@@ -48,6 +48,8 @@
 #define KEYBOARD_ID 0x01
 #define MOUSE_ID 0x02
 
+#define MAX_KEYBOARD_KEYS 6
+
 const uint8_t HID_REPORT_DESCRIPTOR[] = {
   // Keyboard
   0x05, 0x01,        // Usage Page (Generic Desktop)
@@ -147,6 +149,8 @@ class BLE_HID
         BLECharacteristic _keyboard_report;
         BLECharacteristic _mouse_report;
         BLEDevice _remote_device;
+
+        uint8_t _curr_keyboard_button;
 
         uint8_t _key_report_message[KEYBOARD_MESSAGE_LEN];
         uint8_t _mouse_report_message[MOUSE_MESSAGE_LEN];
