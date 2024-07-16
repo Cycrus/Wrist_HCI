@@ -95,6 +95,35 @@ void BMI160::getGradientData(float output[])
         output[i] = _grad_data[fetched_data][i];
 }
 
+void BMI160::testRoutine()
+{
+    float raw_data[6] = {0};
+    float data[6] = {0};
+
+    while(true)
+    {
+        fetchSensorData();
+        getRawData(raw_data);
+        getProcessedData(data);
+
+        Serial.print("1 -1");
+        Serial.print(" ");
+        Serial.print(data[ACC_X]);
+        Serial.print(" ");
+        Serial.print(data[ACC_Y]);
+        Serial.print(" ");
+        Serial.print(data[ACC_Z]);
+        Serial.print(" ");
+        Serial.print(data[GYR_X]);
+        Serial.print(" ");
+        Serial.print(data[GYR_Y]);
+        Serial.print(" ");
+        Serial.println(data[GYR_Z]);
+
+        delay(10);
+    }
+}
+
 int8_t BMI160::__getNextN(int8_t n, uint8_t steps)
 {
     int8_t next_n = n + steps;

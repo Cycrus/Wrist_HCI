@@ -137,6 +137,8 @@ class BLE_HID
 
         void sendKeyboardMessage();
         void sendMouseMessage();
+      
+        void testRoutine();
 
     private:
         BLEService _hid_service;

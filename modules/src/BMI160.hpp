@@ -67,6 +67,7 @@ class BMI160
         void getRawData(float output[]);
         void getProcessedData(float output[]);
         void getGradientData(float output[]);
+        void testRoutine();
 
     private:
         int8_t _curr_n;
