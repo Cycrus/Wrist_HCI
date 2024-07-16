@@ -11,6 +11,7 @@
 #include "src/BLE_HID.hpp"
 
 #define MAX_MOVEMENT_STRENGHT 64
+#define MOUSE_MOVEMENT_GAIN 200.0
 
 #define BUTTON_MOVE_UP 12
 #define BUTTON_MOVE_LEFT 10
@@ -47,8 +48,8 @@ void loop()
             bmi160.fetchSensorData();
             bmi160.getProcessedData(data);
 
-            int16_t x_movement = data[GYR_Z] * 200.0 * -1.0;
-            int16_t y_movement = data[GYR_X] * 200.0;
+            int16_t x_movement = data[GYR_Z] * MOUSE_MOVEMENT_GAIN * -1.0;
+            int16_t y_movement = data[GYR_X] * MOUSE_MOVEMENT_GAIN;
             float click_movement = data[GYR_Y];
 
             if(x_movement > MAX_MOVEMENT_STRENGHT)
