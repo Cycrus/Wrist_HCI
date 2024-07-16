@@ -74,28 +74,28 @@ int16_t BMI160::readMetaData(uint8_t api_reg)
   return data;
 }
 
-void BMI160::getRawData(float output[])
+void BMI160::getRawData(float output[6])
 {
     int8_t fetched_data = __getPrevN(_curr_n);
     for(int i = 0; i < 6; i++)
         output[i] = _raw_data[fetched_data][i];
 }
 
-void BMI160::getProcessedData(float output[])
+void BMI160::getProcessedData(float output[6])
 {
     int8_t fetched_data = __getPrevN(_curr_n);
     for(int i = 0; i < 6; i++)
         output[i] = _final_data[fetched_data][i];
 }
 
-void BMI160::getGradientData(float output[])
+void BMI160::getGradientData(float output[6])
 {
     int8_t fetched_data = __getPrevN(_curr_n);
     for(int i = 0; i < 6; i++)
         output[i] = _grad_data[fetched_data][i];
 }
 
-void BMI160::testRoutine()
+void BMI160::testRoutine(bool filtered)
 {
     float raw_data[6] = {0};
     float data[6] = {0};
@@ -106,19 +106,38 @@ void BMI160::testRoutine()
         getRawData(raw_data);
         getProcessedData(data);
 
-        Serial.print("1 -1");
-        Serial.print(" ");
-        Serial.print(data[ACC_X]);
-        Serial.print(" ");
-        Serial.print(data[ACC_Y]);
-        Serial.print(" ");
-        Serial.print(data[ACC_Z]);
-        Serial.print(" ");
-        Serial.print(data[GYR_X]);
-        Serial.print(" ");
-        Serial.print(data[GYR_Y]);
-        Serial.print(" ");
-        Serial.println(data[GYR_Z]);
+        if(filtered)
+        {
+            Serial.print("1 -1");
+            Serial.print(" ");
+            Serial.print(data[ACC_X]);
+            Serial.print(" ");
+            Serial.print(data[ACC_Y]);
+            Serial.print(" ");
+            Serial.print(data[ACC_Z]);
+            Serial.print(" ");
+            Serial.print(data[GYR_X]);
+            Serial.print(" ");
+            Serial.print(data[GYR_Y]);
+            Serial.print(" ");
+            Serial.println(data[GYR_Z]);
+        }
+        else
+        {
+            Serial.print("1 -1");
+            Serial.print(" ");
+            Serial.print(raw_data[ACC_X]);
+            Serial.print(" ");
+            Serial.print(raw_data[ACC_Y]);
+            Serial.print(" ");
+            Serial.print(raw_data[ACC_Z]);
+            Serial.print(" ");
+            Serial.print(raw_data[GYR_X]);
+            Serial.print(" ");
+            Serial.print(raw_data[GYR_Y]);
+            Serial.print(" ");
+            Serial.println(raw_data[GYR_Z]);
+        }
 
         delay(10);
     }
@@ -165,7 +184,7 @@ int8_t BMI160::__read8(uint8_t reg)
     return value;
 }
 
-void BMI160::__readOutputData(int16_t buffer[])
+void BMI160::__readOutputData(int16_t buffer[6])
 {
     Wire.beginTransmission(BMI160_ADDRESS);
     Wire.write(__BMI160_OUTPUT_REG);
@@ -190,7 +209,7 @@ void BMI160::__readOutputData(int16_t buffer[])
     buffer[ACC_Z] = (int16_t)((data[19] << 8) | data[18]);
 }
 
-void BMI160::__normalizeData(int16_t input_data[], float output_data[])
+void BMI160::__normalizeData(int16_t input_data[6], float output_data[6])
 {
     output_data[GYR_X] = input_data[GYR_X] * 3.14 / 180.0 / 150.0;
     output_data[GYR_Y] = input_data[GYR_Y] * 3.14 / 180.0 / 150.0;
@@ -204,7 +223,7 @@ void BMI160::__normalizeData(int16_t input_data[], float output_data[])
     output_data[ACC_Z] -= 1.0;
 }
 
-void BMI160::__filterData(float input_data[], float prev_input_data[], float output_data[],
+void BMI160::__filterData(float input_data[6], float prev_input_data[6], float output_data[6],
                           float alpha_high, float alpha_low)
 {
   for(int i = 0; i < 6; i++)
@@ -217,7 +236,7 @@ void BMI160::__filterData(float input_data[], float prev_input_data[], float out
   }
 }
 
-void BMI160::__sqrRootData(float input_data[], float output_data[])
+void BMI160::__sqrRootData(float input_data[6], float output_data[6])
 {
     for(int i = 3; i < 6; i++)
     {
@@ -271,7 +290,7 @@ void BMI160::__smoothData(float input_data[][6], float output_data[])
     }
 }
 
-void BMI160::__computeGradient(float input_data[], float prev_input_data[], float output_data[])
+void BMI160::__computeGradient(float input_data[6], float prev_input_data[6], float output_data[6])
 {
     for(int i = 0; i < 6; i++)
     {

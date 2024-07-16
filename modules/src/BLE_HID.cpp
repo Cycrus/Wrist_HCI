@@ -9,6 +9,7 @@
 
 #include "BLE_HID.hpp"
 
+//-----------------------------------------------------------------------------------------------------------------
 BLE_HID::BLE_HID() :
     _hid_service("1812"), // HID service
     _hid_report_map("2A4B", BLERead, sizeof(HID_REPORT_DESCRIPTOR), true),
@@ -20,6 +21,7 @@ BLE_HID::BLE_HID() :
     _curr_keyboard_button{0}
 { }
 
+//-----------------------------------------------------------------------------------------------------------------
 void BLE_HID::initService(const char* device_name)
 {
     if (!BLE.begin())
@@ -50,6 +52,7 @@ void BLE_HID::initService(const char* device_name)
     Serial.println("Bluetooth device active, waiting for connections...");
 }
 
+//-----------------------------------------------------------------------------------------------------------------
 bool BLE_HID::checkRemoteAvailability()
 {
     _remote_device = BLE.central();
@@ -62,6 +65,7 @@ bool BLE_HID::checkRemoteAvailability()
     return false;
 }
 
+//-----------------------------------------------------------------------------------------------------------------
 bool BLE_HID::checkRemoteConnection()
 {
     if (_remote_device)
@@ -71,6 +75,7 @@ bool BLE_HID::checkRemoteConnection()
     return false;
 }
 
+//-----------------------------------------------------------------------------------------------------------------
 void BLE_HID::setKeyboardButtonPress(char button, uint8_t modifier)
 {
     if(_curr_keyboard_button >= MAX_KEYBOARD_KEYS)
@@ -81,22 +86,26 @@ void BLE_HID::setKeyboardButtonPress(char button, uint8_t modifier)
     _curr_keyboard_button++;
 }
 
+//-----------------------------------------------------------------------------------------------------------------
 void BLE_HID::setMouseButtonPress(uint8_t button)
 {
     _mouse_report_message[MOUSE_FIELD_BUTTON] = button;
 }
 
+//-----------------------------------------------------------------------------------------------------------------
 void BLE_HID::setMouseScroll(int8_t wheel)
 {
     _mouse_report_message[MOUSE_FIELD_WHEEL] = wheel;
 }
 
+//-----------------------------------------------------------------------------------------------------------------
 void BLE_HID::setMouseMove(int8_t x, int8_t y)
 {
     _mouse_report_message[MOUSE_FIELD_X] = x;
     _mouse_report_message[MOUSE_FIELD_Y] = y;
 }
 
+//-----------------------------------------------------------------------------------------------------------------
 void BLE_HID::resetKeyboardMessage()
 {
     for(int i = 1; i < KEYBOARD_MESSAGE_LEN; i++)
@@ -105,6 +114,7 @@ void BLE_HID::resetKeyboardMessage()
     _curr_keyboard_button = 0;
 }
 
+//-----------------------------------------------------------------------------------------------------------------
 void BLE_HID::resetMouseMessage()
 {
     for(int i = 1; i < MOUSE_MESSAGE_LEN; i++)
@@ -112,30 +122,35 @@ void BLE_HID::resetMouseMessage()
     _mouse_report_message[0] = MOUSE_ID;
 }
 
+//-----------------------------------------------------------------------------------------------------------------
 void BLE_HID::sendKeyboardRelease()
 {
     uint8_t release_key_report_message[KEYBOARD_MESSAGE_LEN] = {KEYBOARD_ID, 0, 0, 0, 0, 0, 0, 0, 0};
     _keyboard_report.writeValue(release_key_report_message, sizeof(release_key_report_message));
 }
 
+//-----------------------------------------------------------------------------------------------------------------
 void BLE_HID::sendMouseRelease()
 {
     uint8_t release_mouse_report_message[MOUSE_MESSAGE_LEN] = {MOUSE_ID, 0, 0, 0, 0};
     _mouse_report.writeValue(release_mouse_report_message, sizeof(release_mouse_report_message));
 }
 
+//-----------------------------------------------------------------------------------------------------------------
 void BLE_HID::sendKeyboardMessage()
 {
     _keyboard_report.writeValue(_key_report_message, sizeof(_key_report_message));
     resetKeyboardMessage();
 }
 
+//-----------------------------------------------------------------------------------------------------------------
 void BLE_HID::sendMouseMessage()
 {
     _mouse_report.writeValue(_mouse_report_message, sizeof(_mouse_report_message));
     resetMouseMessage();
 }
 
+//-----------------------------------------------------------------------------------------------------------------
 void BLE_HID::testRoutine()
 {
     if(checkRemoteAvailability())
@@ -174,6 +189,7 @@ void BLE_HID::testRoutine()
     }
 }
 
+//-----------------------------------------------------------------------------------------------------------------
 void BLE_HID::__debugPrintMessage(const char* name, uint8_t message[], uint8_t size)
 {
     Serial.print("Message <");

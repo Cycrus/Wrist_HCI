@@ -10,7 +10,7 @@
 #include "src/BMI160.hpp"
 #include "src/BLE_HID.hpp"
 
-#define MAX_MOVEMENT_STRENGHT 70
+#define MAX_MOVEMENT_STRENGHT 64
 
 #define BUTTON_MOVE_UP 12
 #define BUTTON_MOVE_LEFT 10
@@ -37,7 +37,7 @@ void setup()
 
 void loop()
 {
-    //bmi160.testRoutine();
+    //bmi160.testRoutine(true);
     //input_device.testRoutine();
 
     if(input_device.checkRemoteAvailability())
@@ -47,8 +47,8 @@ void loop()
             bmi160.fetchSensorData();
             bmi160.getProcessedData(data);
 
-            int16_t x_movement = data[GYR_Z] * 300.0 * -1.0;
-            int16_t y_movement = data[GYR_X] * 300.0;
+            int16_t x_movement = data[GYR_Z] * 200.0 * -1.0;
+            int16_t y_movement = data[GYR_X] * 200.0;
             float click_movement = data[GYR_Y];
 
             if(x_movement > MAX_MOVEMENT_STRENGHT)
@@ -60,9 +60,13 @@ void loop()
             if(y_movement < -MAX_MOVEMENT_STRENGHT)
                 y_movement = -MAX_MOVEMENT_STRENGHT;
 
+            Serial.print(x_movement);
+            Serial.print(" ");
+            Serial.println(y_movement);
+
             input_device.setMouseMove(x_movement, y_movement);
 
-            if(click_movement > 0.1)
+            /*if(click_movement > 0.1)
             {
                 Serial.println("Left Click");
                 input_device.setMouseButtonPress(MOUSE_LEFT);
@@ -71,7 +75,7 @@ void loop()
             {
                 Serial.println("Right Click");
                 input_device.setMouseButtonPress(MOUSE_RIGHT);
-            }
+            }*/
 
             int button_up = digitalRead(BUTTON_MOVE_UP);
             int button_right = digitalRead(BUTTON_MOVE_RIGHT);
