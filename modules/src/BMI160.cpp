@@ -9,10 +9,12 @@
 
 #include "BMI160.hpp"
 
+//-----------------------------------------------------------------------------------------------------------------
 BMI160::BMI160() :
 _curr_n{0}
 { }
 
+//-----------------------------------------------------------------------------------------------------------------
 void BMI160::configureBMI160()
 {
   __writeRegister(__BMI160_CMD, 0x11);  // Set accelerometer to normal mode
@@ -30,6 +32,7 @@ void BMI160::configureBMI160()
   delay(10);
 }
 
+//-----------------------------------------------------------------------------------------------------------------
 void BMI160::fetchSensorData()
 {
     int8_t prev_n = __getPrevN(_curr_n);
@@ -48,6 +51,7 @@ void BMI160::fetchSensorData()
     _curr_n = __getNextN(_curr_n);
 }
 
+//-----------------------------------------------------------------------------------------------------------------
 int16_t BMI160::readMetaData(uint8_t api_reg)
 {
   int16_t data = 0;
@@ -74,6 +78,7 @@ int16_t BMI160::readMetaData(uint8_t api_reg)
   return data;
 }
 
+//-----------------------------------------------------------------------------------------------------------------
 void BMI160::getRawData(float output[6])
 {
     int8_t fetched_data = __getPrevN(_curr_n);
@@ -81,6 +86,7 @@ void BMI160::getRawData(float output[6])
         output[i] = _raw_data[fetched_data][i];
 }
 
+//-----------------------------------------------------------------------------------------------------------------
 void BMI160::getProcessedData(float output[6])
 {
     int8_t fetched_data = __getPrevN(_curr_n);
@@ -88,6 +94,7 @@ void BMI160::getProcessedData(float output[6])
         output[i] = _final_data[fetched_data][i];
 }
 
+//-----------------------------------------------------------------------------------------------------------------
 void BMI160::getGradientData(float output[6])
 {
     int8_t fetched_data = __getPrevN(_curr_n);
@@ -95,6 +102,7 @@ void BMI160::getGradientData(float output[6])
         output[i] = _grad_data[fetched_data][i];
 }
 
+//-----------------------------------------------------------------------------------------------------------------
 void BMI160::testRoutine(bool filtered)
 {
     float raw_data[6] = {0};
@@ -143,6 +151,7 @@ void BMI160::testRoutine(bool filtered)
     }
 }
 
+//-----------------------------------------------------------------------------------------------------------------
 int8_t BMI160::__getNextN(int8_t n, uint8_t steps)
 {
     int8_t next_n = n + steps;
@@ -153,6 +162,7 @@ int8_t BMI160::__getNextN(int8_t n, uint8_t steps)
     return next_n;
 }
 
+//-----------------------------------------------------------------------------------------------------------------
 int8_t BMI160::__getPrevN(int8_t n, uint8_t steps)
 {
     int8_t prev_n = n - steps;
@@ -163,6 +173,7 @@ int8_t BMI160::__getPrevN(int8_t n, uint8_t steps)
     return prev_n;
 }
 
+//-----------------------------------------------------------------------------------------------------------------
 void BMI160::__writeRegister(uint8_t reg, uint8_t value)
 {
     Wire.beginTransmission(BMI160_ADDRESS);
@@ -171,6 +182,7 @@ void BMI160::__writeRegister(uint8_t reg, uint8_t value)
     Wire.endTransmission();
 }
 
+//-----------------------------------------------------------------------------------------------------------------
 int8_t BMI160::__read8(uint8_t reg)
 {
     Wire.beginTransmission(BMI160_ADDRESS);
@@ -184,6 +196,7 @@ int8_t BMI160::__read8(uint8_t reg)
     return value;
 }
 
+//-----------------------------------------------------------------------------------------------------------------
 void BMI160::__readOutputData(int16_t buffer[6])
 {
     Wire.beginTransmission(BMI160_ADDRESS);
@@ -209,6 +222,7 @@ void BMI160::__readOutputData(int16_t buffer[6])
     buffer[ACC_Z] = (int16_t)((data[19] << 8) | data[18]);
 }
 
+//-----------------------------------------------------------------------------------------------------------------
 void BMI160::__normalizeData(int16_t input_data[6], float output_data[6])
 {
     output_data[GYR_X] = input_data[GYR_X] * 3.14 / 180.0 / 150.0;
@@ -223,6 +237,7 @@ void BMI160::__normalizeData(int16_t input_data[6], float output_data[6])
     output_data[ACC_Z] -= 1.0;
 }
 
+//-----------------------------------------------------------------------------------------------------------------
 void BMI160::__filterData(float input_data[6], float prev_input_data[6], float output_data[6],
                           float alpha_high, float alpha_low)
 {
@@ -236,6 +251,7 @@ void BMI160::__filterData(float input_data[6], float prev_input_data[6], float o
   }
 }
 
+//-----------------------------------------------------------------------------------------------------------------
 void BMI160::__sqrRootData(float input_data[6], float output_data[6])
 {
     for(int i = 3; i < 6; i++)
@@ -248,6 +264,7 @@ void BMI160::__sqrRootData(float input_data[6], float output_data[6])
     }
 }
 
+//-----------------------------------------------------------------------------------------------------------------
 void BMI160::__groundData(float input_data[][6], float output_data[])
 {
     float sum_value[6] = {0};
@@ -271,6 +288,7 @@ void BMI160::__groundData(float input_data[][6], float output_data[])
     }
 }
 
+//-----------------------------------------------------------------------------------------------------------------
 void BMI160::__smoothData(float input_data[][6], float output_data[])
 {
     float sum_value[6] = {0};
@@ -290,6 +308,7 @@ void BMI160::__smoothData(float input_data[][6], float output_data[])
     }
 }
 
+//-----------------------------------------------------------------------------------------------------------------
 void BMI160::__computeGradient(float input_data[6], float prev_input_data[6], float output_data[6])
 {
     for(int i = 0; i < 6; i++)

@@ -9,18 +9,20 @@
 
 #include "src/BMI160.hpp"
 #include "src/BLE_HID.hpp"
+#include "src/ButtonMatrix.hpp"
 
 #define MAX_MOVEMENT_STRENGHT 64
 #define MOUSE_MOVEMENT_GAIN 200.0
 
-#define BUTTON_MOVE_UP 12
-#define BUTTON_MOVE_LEFT 10
-#define BUTTON_MOVE_RIGHT 8
-#define BUTTON_MOVE_DOWN 6
+#define BUTTON_ROW_1 12
+#define BUTTON_ROW_2 10
+#define BUTTON_COL_1 8
+#define BUTTON_COL_2 6
 
 float data[6] = {0};
 BMI160 bmi160;
 BLE_HID input_device;
+ButtonMatrix buttons;
 
 void setup()
 {
@@ -30,10 +32,10 @@ void setup()
     Wire.begin();
     bmi160.configureBMI160();
 
-    pinMode(BUTTON_MOVE_UP, INPUT);
-    pinMode(BUTTON_MOVE_LEFT, INPUT);
-    pinMode(BUTTON_MOVE_RIGHT, INPUT);
-    pinMode(BUTTON_MOVE_DOWN, INPUT);
+    buttons.addRowPin(BUTTON_ROW_1);
+    buttons.addRowPin(BUTTON_ROW_2);
+    buttons.addColPin(BUTTON_COL_1);
+    buttons.addColPin(BUTTON_COL_2);
 }
 
 void loop()
@@ -61,9 +63,9 @@ void loop()
             if(y_movement < -MAX_MOVEMENT_STRENGHT)
                 y_movement = -MAX_MOVEMENT_STRENGHT;
 
-            Serial.print(x_movement);
+            /*Serial.print(x_movement);
             Serial.print(" ");
-            Serial.println(y_movement);
+            Serial.println(y_movement);*/
 
             input_device.setMouseMove(x_movement, y_movement);
 
@@ -78,25 +80,26 @@ void loop()
                 input_device.setMouseButtonPress(MOUSE_RIGHT);
             }*/
 
-            int button_up = digitalRead(BUTTON_MOVE_UP);
-            int button_right = digitalRead(BUTTON_MOVE_RIGHT);
-            int button_down = digitalRead(BUTTON_MOVE_DOWN);
-            int button_left = digitalRead(BUTTON_MOVE_LEFT);
+            buttons.fetchButtonPresses();
 
-            if(digitalRead(BUTTON_MOVE_UP) == HIGH)
+            if(buttons.checkButtonPress(0, 0))
             {
+                Serial.println("Button up");
                 input_device.setKeyboardButtonPress('w', MOD_LEFT_CTR | MOD_LEFT_ALT);
             }
-            if(digitalRead(BUTTON_MOVE_DOWN) == HIGH)
+            if(buttons.checkButtonPress(0, 1))
             {
+                Serial.println("Button down");
                 input_device.setKeyboardButtonPress('s', MOD_LEFT_CTR | MOD_LEFT_ALT);
             }
-            if(digitalRead(BUTTON_MOVE_LEFT) == HIGH)
+            if(buttons.checkButtonPress(1, 0))
             {
+                Serial.println("Button left");
                 input_device.setKeyboardButtonPress('a', MOD_LEFT_CTR | MOD_LEFT_ALT);
             }
-            if(digitalRead(BUTTON_MOVE_RIGHT) == HIGH)
+            if(buttons.checkButtonPress(1, 1))
             {
+                Serial.println("Button right");
                 input_device.setKeyboardButtonPress('d', MOD_LEFT_CTR | MOD_LEFT_ALT);
             }
 
