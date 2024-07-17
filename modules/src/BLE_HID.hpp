@@ -149,9 +149,11 @@ class BLE_HID
     ///
     /// Checks if a remote device exists yet.
     ///
+    /// @param verbose      If true it prints the MAC of the connected device on the Serial.
+    ///
     /// @return True if a remote device exists.
     //
-    bool checkRemoteAvailability();
+    bool checkRemoteAvailability(bool verbose);
 
     //-----------------------------------------------------------------------------------------------------------------
     ///

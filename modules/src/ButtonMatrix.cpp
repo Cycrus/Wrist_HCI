@@ -40,10 +40,10 @@ uint8_t ButtonMatrix::addRowPin(uint8_t row)
 //-----------------------------------------------------------------------------------------------------------------
 uint8_t ButtonMatrix::addColPin(uint8_t col)
 {
-    if(_set_rows >= COLS)
+    if(_set_cols >= COLS)
         return 1;
 
-    _row_pins[_set_cols] = col;
+    _col_pins[_set_cols] = col;
     pinMode(col, INPUT_PULLUP);
     _set_cols++;
 
@@ -59,13 +59,9 @@ void ButtonMatrix::fetchButtonPresses()
         for(int col = 0; col < COLS; col++)
         {
             if(digitalRead(_col_pins[col]) == LOW)
-            {
                 _button_presses[row][col] = true;
-            }
             else
-            {
                 _button_presses[row][col] = false;
-            }
         }
         digitalWrite(_row_pins[row], HIGH);
     }

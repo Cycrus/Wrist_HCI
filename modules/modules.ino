@@ -12,7 +12,8 @@
 #include "src/ButtonMatrix.hpp"
 
 #define MAX_MOVEMENT_STRENGHT 64
-#define MOUSE_MOVEMENT_GAIN 200.0
+#define MOUSE_MOVEMENT_GAIN_X 200.0
+#define MOUSE_MOVEMENT_GAIN_Y 200.0
 
 #define BUTTON_ROW_1 12
 #define BUTTON_ROW_2 10
@@ -43,15 +44,16 @@ void loop()
     //bmi160.testRoutine(true);
     //input_device.testRoutine();
 
-    if(input_device.checkRemoteAvailability())
-    {
-        while(input_device.checkRemoteConnection())
-        {
-            bmi160.fetchSensorData();
-            bmi160.getProcessedData(data);
+    buttons.fetchButtonPresses();
+    bmi160.fetchSensorData();
+    bmi160.getProcessedData(data);
 
-            int16_t x_movement = data[GYR_Z] * MOUSE_MOVEMENT_GAIN * -1.0;
-            int16_t y_movement = data[GYR_X] * MOUSE_MOVEMENT_GAIN;
+    if(input_device.checkRemoteAvailability(false))
+    {
+        if(input_device.checkRemoteConnection())
+        {
+            int16_t x_movement = data[GYR_Z] * MOUSE_MOVEMENT_GAIN_X * -1.0;
+            int16_t y_movement = data[GYR_X] * MOUSE_MOVEMENT_GAIN_Y;
             float click_movement = data[GYR_Y];
 
             if(x_movement > MAX_MOVEMENT_STRENGHT)
@@ -62,10 +64,6 @@ void loop()
                 y_movement = MAX_MOVEMENT_STRENGHT;
             if(y_movement < -MAX_MOVEMENT_STRENGHT)
                 y_movement = -MAX_MOVEMENT_STRENGHT;
-
-            /*Serial.print(x_movement);
-            Serial.print(" ");
-            Serial.println(y_movement);*/
 
             input_device.setMouseMove(x_movement, y_movement);
 
@@ -79,8 +77,6 @@ void loop()
                 Serial.println("Right Click");
                 input_device.setMouseButtonPress(MOUSE_RIGHT);
             }*/
-
-            buttons.fetchButtonPresses();
 
             if(buttons.checkButtonPress(0, 0))
             {

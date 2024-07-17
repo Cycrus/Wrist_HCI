@@ -53,13 +53,16 @@ void BLE_HID::initService(const char* device_name)
 }
 
 //-----------------------------------------------------------------------------------------------------------------
-bool BLE_HID::checkRemoteAvailability()
+bool BLE_HID::checkRemoteAvailability(bool verbose)
 {
     _remote_device = BLE.central();
     if(_remote_device)
     {
-        Serial.print("Found device: ");
-        Serial.println(_remote_device.address());
+        if(verbose)
+        {
+            Serial.print("Found device: ");
+            Serial.println(_remote_device.address());
+        }
         return true;
     }
     return false;
@@ -153,7 +156,7 @@ void BLE_HID::sendMouseMessage()
 //-----------------------------------------------------------------------------------------------------------------
 void BLE_HID::testRoutine()
 {
-    if(checkRemoteAvailability())
+    if(checkRemoteAvailability(true))
     {
         while(checkRemoteConnection())
         {
