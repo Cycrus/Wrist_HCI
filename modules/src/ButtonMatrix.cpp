@@ -55,14 +55,29 @@ void ButtonMatrix::fetchButtonPresses()
 {
     for(int row = 0; row < ROWS; row++)
     {
-        digitalWrite(_row_pins[row], LOW);
+        // Set the current row to LOW and all other rows to HIGH-Z (input mode)
+        for(int r = 0; r < ROWS; r++)
+        {
+            pinMode(_row_pins[r], (r == row) ? OUTPUT : INPUT);
+            if (r == row) {
+                digitalWrite(_row_pins[r], LOW);
+            }
+        }
+
         for(int col = 0; col < COLS; col++)
         {
             if(digitalRead(_col_pins[col]) == LOW)
+            {
                 _button_presses[row][col] = true;
+            }
             else
+            {
                 _button_presses[row][col] = false;
+            }
         }
+
+        // Reset the current row back to high (optional)
+        pinMode(_row_pins[row], OUTPUT);
         digitalWrite(_row_pins[row], HIGH);
     }
 }
